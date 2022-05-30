@@ -64,4 +64,5 @@ const deleteOne = async (req,res)=>{
     }
 }
 
+
 module.exports = { findMany, createOne, findOne, updateOne,deleteOne };
