@@ -2,7 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const db = require("./db");
-const forumRouter = require("./resources/catalog/catalog.router");
+const catalogRouter = require("./resources/catalog/catalog.router");
+const productRouter = require("./resources/product/product.router")
 
 const app = express();
 app.use(morgan("dev")); //sale más info de la petición en el terminal
@@ -13,7 +14,8 @@ app.get("/", async (req,res)=> {
     res.status(200).send({test:"hello world"});
 });
 
-app.use('/catalogs', forumRouter);
+app.use('/catalogs', catalogRouter);
+app.use('/products', productRouter);
 
 const startServer = async () =>{
     await db.connect();

@@ -1,4 +1,5 @@
-const Catalog = require("./catalog.model")
+const Catalog = require("./catalog.model");
+const Product = require("../product/product.model");
 
 const findMany = async (req,res)=>{
     try{
@@ -14,7 +15,7 @@ const createOne = async (req,res)=>{
     try{
         const newCatalog = req.body;
         const doc = await Catalog.create(newCatalog);
-        res.status(200).json({results: doc})
+        res.status(201).json({results: doc})
     }catch(e){
         console.log(e);
         res.status(500).json({error:'Creation failed'})
@@ -36,10 +37,9 @@ const findOne = async (req, res) =>{
 }
 
 const updateOne = async (req,res)=>{
-//"new: true" to return the document after update
 try{
     const {id} = req.params;
-    const doc = await Catalog.findOneAndUpdate({_id: id},req.body,{new:true}); 
+    const doc = await Catalog.findOneAndUpdate({_id: id},req.body,{new:true});//"new: true" to return the document after update
     if(!doc){
         return res.status(404).json({error:'Not found'});
     }
@@ -64,5 +64,34 @@ const deleteOne = async (req,res)=>{
     }
 }
 
+const findMessagesById = async (req,res)=>{
+    try{
+        const {catalogid} = req.params;
+        const docs = await Product.find({catalog_id: catalogid});
+        if(docs === null){
+            res.status(400).send({error: `Catalog with ID ${catalogid} not found.`})
+        }
+        res.status(200).json({results: docs});
+    }catch(e){
+        console.log(e);
+        res.status(500).json( {error : 'Internal error'});
+    }
+}
 
-module.exports = { findMany, createOne, findOne, updateOne,deleteOne };
+const createMessageById = async (req,res)=>{
+    try{
+        const newCatalog = req.body;
+        const {catalogid} = req.params;
+        newCatalog.catalog_id = catalogid;
+        const doc = await Product.create(newCatalog);
+        if(doc === null){
+            res.status(400).send({error: `Catalog with ID ${catalogid} not found.`})
+        }
+        res.status(201).json({results: doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json( {error : 'Internal error'});
+    }
+}
+
+module.exports = { findMany, createOne, findOne, updateOne,deleteOne, findMessagesById, createMessageById };

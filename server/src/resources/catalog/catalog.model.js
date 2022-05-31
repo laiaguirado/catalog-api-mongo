@@ -7,7 +7,7 @@ const catalogSchema = new Schema({
         required: true,
         unique: true,
         maxlength: 20
-    }
+    } 
 });
 
 const Catalog = mongoose.model('catalog', catalogSchema);
