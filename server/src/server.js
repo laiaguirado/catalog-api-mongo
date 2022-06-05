@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", async (req,res)=> {
-    res.status(200).send({test:"hello world"});
+    res.status(200).send({API:"This is a Shop API with Catalogs & Products"});
 });
 
 app.use('/catalogs', catalogRouter);
