@@ -35,4 +35,33 @@ const findOne = async (req, res) =>{
     }
 }
 
-module.exports = {findMany, createOne, findOne};
+const updateOne = async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const updatedProduct = req.body;
+        const doc = await Product.findOneAndUpdate({_id: id},updatedProduct,{new:true});
+        if(!doc){
+            return res.status(404).json({error:'Not found'});
+        }
+        res.status(200).json({results:doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json({error:'Cannot update'});
+    }
+}
+
+const deleteOne = async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const doc = await Product.findOneAndDelete({_id: id}); 
+        if(!doc){
+            return res.status(404).json({error:'Not found'});
+        }
+        res.status(200).json({results: doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json({error:'Cannot delete'})
+    }
+}
+
+module.exports = {findMany, createOne, findOne, updateOne,deleteOne};

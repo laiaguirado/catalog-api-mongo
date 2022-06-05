@@ -37,17 +37,17 @@ const findOne = async (req, res) =>{
 }
 
 const updateOne = async (req,res)=>{
-try{
-    const {id} = req.params;
-    const doc = await Catalog.findOneAndUpdate({_id: id},req.body,{new:true});//"new: true" to return the document after update
-    if(!doc){
-        return res.status(404).json({error:'Not found'});
+    try{
+        const {id} = req.params;
+        const doc = await Catalog.findOneAndUpdate({_id: id},req.body,{new:true});//"new: true" to return the document after update
+        if(!doc){
+            return res.status(404).json({error:'Not found'});
+        }
+        res.status(200).json({results:doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json({error:'Cannot update'});
     }
-    res.status(200).json({results:doc});
-}catch(e){
-    console.log(e);
-    res.status(500).json({error:'Cannot update'});
-}
 }
 
 const deleteOne = async (req,res)=>{
@@ -64,7 +64,7 @@ const deleteOne = async (req,res)=>{
     }
 }
 
-const findMessagesById = async (req,res)=>{
+const findProductsById = async (req,res)=>{
     try{
         const {catalogid} = req.params;
         const docs = await Product.find({catalog_id: catalogid});
@@ -78,20 +78,51 @@ const findMessagesById = async (req,res)=>{
     }
 }
 
-const createMessageById = async (req,res)=>{
+const createProductById = async (req,res)=>{
     try{
-        const newCatalog = req.body;
+        const newProduct = req.body;
         const {catalogid} = req.params;
-        newCatalog.catalog_id = catalogid;
-        const doc = await Product.create(newCatalog);
+        newProduct.catalog_id = catalogid;
+        const doc = await Product.create(newProduct);
         if(doc === null){
             res.status(400).send({error: `Catalog with ID ${catalogid} not found.`})
         }
         res.status(201).json({results: doc});
     }catch(e){
         console.log(e);
-        res.status(500).json( {error : 'Internal error'});
+        res.status(500).json( {error : 'Creation failed'});
     }
 }
 
-module.exports = { findMany, createOne, findOne, updateOne,deleteOne, findMessagesById, createMessageById };
+const updateProductById = async (req,res)=>{
+    try{
+        const updatedProduct = req.body;
+        const {id,catalogid} = req.params;
+        updatedProduct.catalog_id = catalogid;
+        const doc = await Product.findOneAndUpdate({_id: id},updatedProduct,{new:true});
+        Catalog.findOneAndUpdate({_id: id},req.body,{new:true});
+        if(doc === null){
+            res.status(400).send({error: `Catalog with ID ${catalogid} not found.`})
+        }
+        res.status(201).json({results: doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json({error:'Cannot update'});
+    }
+}
+
+const deleteProductById = async (req,res)=>{
+    try{
+        const {id, catalogid} = req.params;
+        const doc = await Product.findOneAndDelete({$and: [{_id: id, catalog_id: catalogid}]});
+        if(!doc){
+            return res.status(404).json({error:'Not found'});
+        }
+        res.status(200).json({results: doc});
+    }catch(e){
+        console.log(e);
+        res.status(500).json({error:'Cannot delete'});
+    }
+}
+
+module.exports = { findMany, createOne, findOne, updateOne,deleteOne, findProductsById, createProductById, updateProductById, deleteProductById};
